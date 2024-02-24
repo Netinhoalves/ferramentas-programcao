@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estruturas de dados do Python</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="pseudocode.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+  <script defer>hljs.configure({ cssSelector: "code", languages: ["python"] }); hljs.highlightAll(); hljs.initLineNumbersOnLoad();</script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body,{delimiters:[{left: '$$', right: '$$', display: true},{left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+  <style>
+    img {
+        max-width: 90vw;
+        max-height: 90vh;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .katex {
+        /* o padrão é 1.21, vc pode remover essa configuração se quiser deixar o padrão */
+        font-size: 1.0em;
+    }
+
+    table.custom,
+    table.custom>thead>tr>th,
+    table.custom>tbody>tr>td,
+    table.custom>tbody>tr>th {
+        /* tabela centralizada e com bordas */
+        border: 1px solid black;
+        border-collapse: collapse;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 5px;
+        padding-right: 5px;
+        text-align: center;
+    }
+
+    table pre {
+        /* Remove a margem interna de tags pre dentro de tabelas */
+        margin: 0;
+        padding: 0;
+        text-align: left;
+    }
+
+    td:has(pre) {
+        /* tags pre dentro de tabela são alinhadas no topo à esquerda */
+        vertical-align: top;
+    }
+
+    table.align-left th,
+    table.align-left td {
+        /* alinha à esquerda as células da tabela */
+        text-align: left;
+    }
+
+    ol.excs {
+        /* lista de exercícios */
+        padding-inline-start: 0em;
+        counter-reset: excs;
+        list-style: none;
+    }
+
+    ol.excs>li::before {
+        /* lista de exercícios */
+        counter-increment: excs;
+        content: counters(excs, ".") ". ";
+    }
+
+    ol.excs>li {
+        /* Change this to adjust the line color and thickness */
+        border-left: 2px solid #000;
+        /* Optional: Add padding to create some space between the bar and content */
+        padding-left: 10px;
+
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+    }
+
+    ol.section {
+        counter-reset: section;
+        list-style-type: none;
+    }
+
+    ol.section li::before {
+        counter-increment: section;
+        content: counters(section, ".") ". ";
+    }
+
+    td.hljs-ln-numbers {
+        /* estilizar as linhas de código da extensao highlightjs-line-numbers */
+        color: #ccc;
+        border-right: 1px solid #999;
+        padding-right: 5px;
+    }
+
+    td.hljs-ln-code {
+        /* estilizar as linhas de código da extensao highlightjs-line-numbers */
+        padding-left: 10px;
+    }
+</style>
+</head>
+
+<div id="6-python-data-structures">
+<h1>6 Estruturas de dados do Python</h1>
+<div id="6-1-empty-objects">
+    <h2>Objetos vazios</h2>
+    <p>Se toda classe herda de <code>object</code>, poderíamos instanciar um <code>object</code> diretamente. Entretanto, não podemos adicionar atributos a um objeto <code>object</code>:</p>
+    <pre><code>>>> o = object()
+>>> o.x = 5
+Traceback (most recent call last):
+File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'object' object has no attribute 'x'</code></pre>
+    <p>O Python desabilita propriedades arbitrárias em várias classes integradas, por padrão, para economizar memória. Também é possível desabilitar propriedades arbitrárias em nossas próprias classes usando <b>slots</b>, mas isto está além do escopo deste livro.</p>
+    Mas você pode instanciar objetos de suas próprias classes e adicionar atributos posteriormente:
+    <pre><code>>>> class MyObject(): pass
+... 
+>>> m = MyObject()
+>>> m.x = "hello"
+>>> m.x
+'hello'</code></pre>
+    <p>Entretanto, se você precisa apenas agrupar dados relacionados, pode usar classes do Python feitas para isso. Lembre-se, um objeto só faz sentido se tiver tanto dados quanto comportamentos.</p>
+</div>
+<div id="6-2-tuples-and-named-tuples">
+    <h2>Tuplas e tuplas nomeadas</h2>
+    <p>Tuplas nada mais são do que listas imutáveis, isto é, você não pode adicionar ou excluir objetos de uma tupla depois de instanciada. Esta propriedade garante a integridade dos dados, tornando as tuplas adequadas para representar valores que devem permanecer constantes ao longo do programa. Quando você precisa de uma coleção ordenada de elementos que não devem ser modificados, tupla é uma melhor alternativa à lista.</p>
+    <p>O principal propósito de uma tupla é agregar diferentes partes de dados em um único contêiner. Por exemplo, para criar uma tupla contendo o código de uma ação, e seus preços atual, maior e menor do dia:</p>
+    <pre><code>>>> stock = "FB", 177.46, 178.67, 175.79
+>>> stock = ("FB", 177.46, 178.67, 175.79)</code></pre>
+    <p>As duas linhas anteriores são equivalente. Ao instanciar uma tupla, os parênteses são opcionais, ao não ser que esteja dentro de outros parênteses, como um argumento de função. Por exemplo, a seguinte função recebe os dados de duas ações e retorna a ação que teve a maior subida percentual de preço:</p>
+    <pre><code>def calculate_percentage_change(lowest, highest):
+if lowest > highest:
+    lowest, highest = highest, lowest
+return highest / lowest - 1
+
+def get_stock_with_highest_percentage_change(stock1, stock2):
+code1, _, lowest_price1, highest_price1 = stock1
+code2, _, lowest_price2, highest_price2 = stock2
+
+percentage_change1 = calculate_percentage_change(lowest_price1, highest_price1)
+percentage_change2 = calculate_percentage_change(lowest_price2, highest_price2)
+
+if percentage_change1 > percentage_change2:
+    return code1, percentage_change1
+else:
+    return code2, percentage_change2
+
+stock = ("GOOGL", 1200.0, 1100.0, 1300.0)
+
+result = get_stock_with_highest_percentage_change(("AAPL", 150.0, 140.0, 160.0), stock)
+
+print(f"Stock with the highest percentage change: {result[0]}")
+print(f"Average value of the share with the highest percentage change: {result[1]}")</code></pre>
+
+    <p>Nas linhas 3, 7 e 8 fizemos <b>desempacotamento</b> (unpacking), ou <b>destruturação</b> (destructuring) da tupla, um recurso que lhe permite atribuir valores de objetos iteráveis (como tupla e lista) a múltiplas variáveis em uma única linha. Por convenção, quando destruturamos um valor que não precisamos, usamos o <code>_</code>, como nas linhas 7 e 8.</p>
+    <p>Ainda, percebemos que tuplas podem carecer de legibilidade, pois os dados dentro dela não são nomeados.</p>
+
+    <div id="6-2-1-named-tuples">
+        <h3>Tuplas nomeadas</h3>
+        <p>Se não precisarmos adicionar comportamento ao objeto e soubermos antecipadamente quais atributos precisamos armazenar, podemos usar uma tupla nomeada. Tuplas nomeadas são uma ótima maneira de agrupar dados somente-leitura.</p>
+        <pre><code>from collections import namedtuple
+
+Stock = namedtuple("Stock", ("symbol", "current", "high", "low"))
+stock1 = Stock("FB", 177.46, 178.67, 175.79)
+print(stock1.high, stock1[3])
+stock2 = Stock("AAPL", 150.0, 140.0, 160.0)
+symbol, current, high, low = stock2
+print(symbol, current)
+
+stock1.low = 0 # can't set attribute
+stock1.average = 176 # can't create attribute</code></pre>
+        <p>O primeiro argumento de <code>namedtuple</code> é o nome da tupla nomeada, e o segundo é um iterável contendo os nomes dos atributos da tupla nomeada. O retorno é um objeto que pode ser chamado como uma classe normal para instanciar objetos.</p>
+        <p>Tuplas nomeadas são como tuplas, podemos acessar seus "atributos" via índices, e não podemos modificar ou acrescentar atributos.</p>
+    </div>
+</div>
+<div id="6-3-dataclasses">
+    <h2>Dataclasses</h2>
+    <p>Para conseguirmos modificar ou acrescentar atributos, podemos usar <code>dataclass</code>:</p>
+    <pre><code>from dataclasses import make_dataclass
+Stock = make_dataclass("Stock", ("symbol", "current", "high", "low"))</code></pre>
+    <p>Observe a alternativa tradicional de criar uma classe, como fica mais verboso:</p>
+    <pre><code>class StockRegular:
+def __init__(self, name, current, high, low):
+    self.name = name
+    self.current = current
+    self.high = high
+    self.low = low</code></pre>
+
+    <p>Agora só usar como se fosse um objeto comum.</p>
+    <pre><code>stock1 = Stock("FB", 177.46, high=178.67, low=175.79)
+stock2 = Stock("FB", 177.46, high=178.67, low=175.79)
+
+print(stock1)
+print(stock1 == stock2)
+
+stock1.current = 178.25
+stock1.unexpected_attribute = "allowed"
+
+print(stock1)
+print(stock1 == stock2)</code></pre>
+
+    <p>Outra vantagem de <code>dataclass</code> é que você ganha de brinde os métodos para converter em string e comparar objetos, diferentemente de classes tradicionais:</p>
+    <pre><code>stock_regular1 = StockRegular("FB", 177.46, high=178.67, low=175.79)
+stock_regular2 = StockRegular("FB", 177.46, high=178.67, low=175.79)
+
+print(stock_regular1)
+print(stock_regular1 == stock_regular2)</code></pre>
+    <div id="6-3-1-dataclass-decorator">
+        <h3>A decoração <code>@dataclass</code></h3>
+        <p>A decoração <code>@dataclass</code> declara <code>dataclass</code>es com tipagem. Apesar da sintaxe não ser tão menos verbosa quanto classes tradicionais, <code>dataclassse</code> vem com vários recursos interessantes:</p>
+        <pre><code>from dataclasses import dataclass
+
+
+@dataclass(order=True)
+class Movie:
+title: str
+release_year: int
+release_month: int = None
+release_day: int = None
+rating: float = None
+
+def better_than(self, other):
+    return self.rating > other.rating
+
+
+movie1 = Movie("Ocean's Eleven", 2001, 12, rating=7.7)
+movie2 = Movie("Ocean's Eleven", 1960, rating=6.5)
+
+print(movie1)
+print(movie2)
+print(movie1 &lt; movie2)
+print(movie1.better_than(movie2))</code></pre>
+
+        <p>É possível atribuir valores padrões aos atributos e, com o argumento <code>order=True</code>, torna-se possível realizar não apenas verificações de igualdade, mas também comparações como menor ou maior. A comparação, por padrão, é feita por atributo, seguindo a ordem em que foram declarados, até que atributos com valores distintos sejam encontrados. Você pode alterar o modo de comparação, bem como utilizar vários outros recursos oferecidos pela classe <code>dataclass</code>. Para mais informações, <a href="https://realpython.com/python-data-classes/#more-flexible-data-classes">acesse aqui</a>.</p>
+    </div>
+</div>
+<div id="6-4-dictionaries">
+    <h2>Dicionários</h2>
+    <p>Um dicionário, em Python, é uma coleção de pares chave-valor. Dicionários em Python são implementados como tabelas hash, uma estrutura de dados altamente eficiente para buscar por itens. A sintaxe de dicionários em Python é parecida com objetos JSON:</p>
+    <pre><code>stocks = {
+"AAPL": (150.0, 140.0, 160.0),
+"GOOG": (1235.20, 1242.54, 1231.06),
+"MSFT": (110.41, 110.45, 109.84),
+"FB": (177.46, 178.67, 175.79),
+}</code></pre>
+    <p>Um dicionário é um objeto, como qualquer outro em Python, que tem seus próprios métodos. Dentre eles se destacam:</p>
+    <pre><code>>>> stocks["GOOG"]
+(1235.20, 1242.54, 1231.06)
+>>> stocks["RIM"]
+Traceback (most recent call last):
+File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+KeyError: 'RIM'
+>>> print(stocks.get("RIM"))
+None
+>>> stocks.get("RIM", "NOT FOUND")
+'NOT FOUND'
+>>> stocks.setdefault("GOOG", "INVALID")
+(613.3, 625.86, 610.5)
+>>> stocks.setdefault("BBRY", (10.87, 10.76, 10.90))
+(10.50, 10.62, 10.39)
+>>> stocks["BBRY"]
+(10.50, 10.62, 10.39)
+>>> stocks["GOOG"] = (1245.21, 1252.64, 1245.18)
+>>> stocks["GOOG"]
+(1245.21, 1252.64, 1245.18)
+>>> del stocks["GOOG"]
+>>> stocks["GOOG"]
+Traceback (most recent call last):
+File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+KeyError: 'GOOG'</code></pre>
+    <p>A diferença entre os métodos <code>get</code> e <code>setdefault</code> é que este, além de retornar um valor padrão caso a chave não se encontre no dicionário, também adiciona no dicionário essa chave com o valor padrão.</p>
+    <p>Também temos os métodos <code>keys</code>, <code>values</code> e <code>items</code>, que retornam, respectivamente, um iterador das chaves, valores e tuplas chave-valor do dicionário:</p>
+    <pre><code>>>> stocks.keys()
+dict_keys(['AAPL', 'GOOG', 'MSFT', 'FB'])
+>>> for prices in stocks.values(): prices
+... 
+(150.0, 140.0, 160.0)
+(1235.2, 1242.54, 1231.06)
+(110.41, 110.45, 109.84)
+(177.46, 178.67, 175.79)
+>>> for stock, prices in stocks.items():
+...     print(f"{stock} higest value is {prices[0]}")
+... 
+AAPL higest value is 150.0
+GOOG higest value is 1235.2
+MSFT higest value is 110.41
+FB higest value is 177.46</code></pre>
+    <p>Observe que ao iterar pelas tuplas, podemos desempacotar a chave e o valor em variáveis.</p>
+    <p>Embora o comum seja usar strings como chaves, podemos usar qualquer objeto "hasheável":</p>
+    <pre><code>random_keys = {}
+random_keys["astring"] = "somestring"
+random_keys[5] = "aninteger"
+random_keys[25.2] = "floats work too"
+random_keys[("abc", 123)] = "so do tuples"
+
+class AnObject:
+def __init__(self, avalue):
+    self.avalue = avalue
+
+my_object = AnObject(14)
+random_keys[my_object] = "We can even store objects"
+my_object.avalue = 12
+
+try:
+random_keys[[1, 2, 3]] = "we can't store lists though"
+except:
+print("unable to store list\n")
+
+for key, value in random_keys.items():
+print(f"{key} has value {value}")</code></pre>
+
+    <p>Geralmente objetos mutáveis, como listas e dicionários, não são hasheáveis, portanto, não podem ser usados como chaves de dicionários. O valor <b>hash</b> de um objeto é como se fosse sua "impressão digital": permanece a mesma enquanto o objeto existir. Por padrão, o hash de objetos de classes personalizadas é um número equivalente ao seu endereço de memória, que é inclusive usado ao imprimir ou comparar o objeto quando não se sobrescrevem os métodos <code>__str__</code> e <code>__eq__</code>. Você também pode sobrescrever o método <code>__hash__</code>, caso queira calcular e retornar um hash baseado nos valores dos atributos do objeto.</p>
+    <p>Tecnicamente, a maioria dos objetos em Python é implementada utilizando dicionários nos bastidores. A maioria dos objetos possui o atributo mágico <code>obj.__dict__</code>. Quando você acessa um atributo em um objeto usando <code>obj.nome_do_atributo</code>, essencialmente isso é traduzido para <code>obj['nome_do_atributo']</code> nos bastidores.</p>
+
+    <div id="6-4-1-dictionary-use-cases">
+        <h3>Casos de uso de dicionários</h3>
+        <p>Um dicionário poderia ser usado para armazenar informações específicas de um tipo de dados, como uma ação da bolsa...</p>
+        <pre><code>aapl = {"code": "AAPL", "current": 150.0, "low": 140.0, "high": 160.0}</code></pre>
+        <p>... ou até mesmo para armazenar informações de vários dados de um tipo:</p>
+        <pre><code>stocks = {
+"AAPL": aapl,
+"GOOG": {"current": 1235.2, "low": 1242.54, "high": 1231.06},
+"MSFT": {"current": 110.41, "low": 110.45, "high": 109.84}
+}</code></pre>
+
+        <p>Quando usar dicionários, dataclasses ou tuplas?</p>
+        <p>Quando sabemos exatamente quais atributos um dado deve armazenar, especialmente se quisermos manter uma certa documentação, podemos usar dataclasses.</p>
+        <p>Na verdade, como dataclasses veio depois de tuplas nomeadas, a tendência é que passem a ser mais utilizadas. Mas para casos em que queiramos usar desempacotamento ou iteração, podemos escolher tuplas nomeadas.</p>
+        <p>Dicionários podem ser mais interessantes quando não sabemos de antemão quais os atributos de um dado, ou se nem todos os dados terão os mesmos atributos, e também quando precisamos fazer consultas rápidas de dados pelas chaves.</p>
+    </div>
+    <div id="6-4-2-using-defaultdict">
+        <h3>Usando <code>defaultdict</code></h3>
+        <p>Um caso de uso típico para dicionários é o problema de contar o número de ocorrências de cada elemento de uma sequência:</p>
+        <pre><code>def letter_frequency(sentence):
+frequencies = {}
+for letter in sentence:
+    frequency = frequencies.setdefault(letter, 0)
+    frequencies[letter] = frequency + 1
+return frequencies</code></pre>
+        <p>Para garantir que não vamos tentar modificar o valor de uma chave que não existe, usamos o método <code>setdefault</code> para cada chave. Podemos definir um valor padrão para todas as chaves de uma vez com <code>defaultdict</code>:</p>
+        <pre><code>from collections import defaultdict
+def letter_frequency(sentence):
+frequencies = defaultdict(int)
+for letter in sentence:
+    frequencies[letter] += 1
+return frequencies</code></pre>
+        <p>O construtor da classe <code>defaultdict</code> aceita uma função como argumento, que é chamada sempre que se tenta acessar ou modificar uma chave que não existe. No caso, a função <code>int</code> quando chamada sem argumentos, retorna o valor zero.</p>
+        <p id="defaultdict-custom-function">Considere o seguinte problema: Queremos implementar um dicionário de definição de palavras, mas também queremos saber em que ordem cada palavra foi adicionada. Uma possível solução:</p>
+        <pre><code>from collections import defaultdict
+
+num_items = 0
+
+def tuple_counter():
+global num_items
+num_items += 1
+return [num_items, ""]
+
+d = defaultdict(tuple_counter)
+
+d["pindaíba"][1] = "falta de dinheiro"
+d["gororoba"][1] = "comida duvidosa"
+d["bugiganga"][1] = "quinquilharia"
+d["bizu"][1] = "ideia"
+
+print(f'gororoba significa {d["gororoba"][1]}, e foi a {d["gororoba"][0]}ª palavra a ser adicionada neste dicionário.')</code></pre>
+        <p>Esse exemplo, meramente para demonstrar uma função própria passada como argumento a <code>defaultdict</code>, possui algumas limitações. Por exemplo, se quiséssemos ter mais de um dicionário, precisaríamos de uma variável global para cada um. Além de que a interface com o programador não é tão amigável. Nos exercícios proporemos uma melhora neste código.</p>
+        <div id="6-4-2-1-counter">
+            <h4>Contador</h4>
+            <p>O problema de contar o número de ocorrências é tão comum que a galera do Python criou uma classe especificamente para isso:</p>
+            <pre><code>from collections import Counter
+def letter_frequency(sentence):
+return Counter(sentence)</code></pre>
+            <p>O objeto da classe <code>Counter</code> é basicamente um dicionário em que as chaves são cada um dos elementos de <code>sentence</code> e os valores são suas respectivas quantidades. Esse objeto também possui o método <code>most_common</code>, que pode receber um inteiro <code>x</code> e retorna uma lista ordenada com as <code>x</code> chaves e respectivos valores que mais ocorreram:</p>
+            <pre><code>from collections import Counter
+
+responses = [
+"vanilla",
+"chocolate",
+"vanilla",
+"vanilla",
+"caramel",
+"chocolate",
+"strawberry",
+"vanilla",
+]
+
+print("The children voted for", Counter(responses).most_common(1)[0][0], "ice cream")</code></pre>
+            <p><code>Counter(responses)</code> retorna um objeto contador. O método <code>most_common</code> sempre retorna uma lista, mesmo que esta possua apenas um item. Portanto, <code>most_common(1)</code> retorna uma lista com um único item, o que mais ocorreu, e o primeiro índice <code>[0]</code> acessa esse item. O segundo índice <code>[0]</code> acessa o nome do item, já que se o segundo índice fosse <code>[1]</code>, estaria acessando a quantidade de ocorrências daquele item. Veja um exemplo equivalente destrinchado do <code>print</code> anterior:</p>
+            <pre><code>result = Counter(responses)
+most_voted = result.most_common(2)
+first_most_voted = most_voted[0]
+second_most_voted = most_voted[1]
+# third = most_voted[2] # error, only checked the top 2 most voted!
+first_name = first_most_voted[0]
+first_votes_count = first_most_voted[1]
+print("The children voted for", first_name, "ice cream, with", first_votes_count, "votes.")</code></pre>
+        </div>
+    </div>
+    <div id="6-4-1-exercises">
+        <h3>Exercícios</h3>
+        <ol class="excs">
+            <li>
+                <b>API de Preços de Ações</b>
+                <p>Crie uma API que mantém uma lista dos preços de fechamento de várias ações ao longo dos dias. Utilize dicionários, em que as chaves representam o código da ação e os valores são listas de tuplas contendo a data e o preço de fechamento. Implemente os seguintes métodos:</p>
+                <ul>
+                    <li><code>add(code, date, closing_price)</code>: adiciona informações de preço de fechamento para uma ação específica em uma determinada data. Certifique-se de lidar com casos em que a ação ainda não possui uma entrada no dicionário, usando <code>defaultdict</code>.</li>
+                    <li><code>get_prices(code)</code>: Retorna a lista de tuplas contendo a data e o preço de fechamento para uma ação específica.</li>
+                    <li><code>get_all_stocks()</code>: Retorna uma lista com todos os códigos de ações presentes no dicionário.</li>
+                    <li><code>average_price(code)</code>: Retorna a média dos preços de fechamento de uma ação específica.</li>
+                    <li><code>recent_prices(code, date)</code>: Retorna uma lista com os preços de fechamento de uma ação específica a partir da data <code>date</code>.</li>
+                </ul>
+            </li>
+            <li>
+                <b>Dicionário de definição de palavras</b>
+                <p>Melhore a solução proposta para o problema do dicionário de palavras <a href="#defaultdict-custom-function">definido anteriormente</a>. Crie uma API com os seguintes métodos:</p>
+                <ul>
+                    <li><code>set(word, definition)</code>: Adiciona ou modifica a definição de uma palavra.</li>
+                    <li><code>get(word)</code>: Retorna a definição de uma palavra. Se a palavra não existir no dicionário, retorna uma mensagem indicando que a palavra não foi encontrada.</li>
+                    <li><code>get_word_order(word)</code>: Retorna a ordem em que uma palavra foi adicionada/modificada no dicionário. A ordem deve ser um número inteiro representando a posição da palavra na sequência de adições/modificações.</li>
+                    <li><code>get_all_words()</code>: Retorna uma lista com todas as palavras presentes no dicionário, na ordem em que foram adicionadas/modificadas.</li>
+                </ul>
+            </li>
+            <li>
+                <b>Sistema de eleições</b>
+                <p>Crie um programa para gerenciar uma eleição. Primeiramente, será necessário cadastrar os candidatos e associá-los às suas respectivas chapas. Em seguida, o programa deverá ler a lista de votos, onde cada voto é representado pelo número da chapa do candidato votado.</p>
+                <p>Primeiramente o programa lê a quantidade de candidatos, seguida pelo número da chapa e o nome (única palavra, sem espaços) de cada candidato. Depois o programa lê a quantidade de votos, seguida pelos números das chapas votadas. Caso haja algum número sem chapa cadastrada, considerar como voto nulo. Por fim, o programa deve exibir os dois candidatos mais votados, e a mensagem "SEM SEGUNDO TURNO" ou "COM SEGUNDO TURNO", caso o primeiro candidato tenha conseguido mais de 50% dos votos ou não. Caso haja empate, o critério de desempate é a ordem alfabética. A entrada e saída de dados deve obedecer ao seguinte padrão de exemplo:</p>
+                <table class="custom">
+                    <thead>
+                        <tr>
+                            <th>Entrada</th>
+                            <th>Saída</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <pre>3
+14
+Fulano
+42
+Beltrano
+20
+Sicrano
+5
+20
+14
+0
+42
+20</pre>
+                            </td>
+                            <td>
+                                <pre>Sicrano
+Beltrano
+COM SEGUNDO TURNO</pre>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </li>
+            <!-- Faltou um exercício que seja interessante usar a classe counter... -->
+            <!-- exercício pra converter de tupla pra dataclass ou alguma coisa assim -->
+        </ol>
+    </div>
+</div>
+</div>
+
+<!-- Another way to create the same list is pairs = [(v, k) for (k, v) in d.items()]. -->
+</body>
+
+</html>
